@@ -233,7 +233,9 @@ namespace SteamToolset
 			Console.WriteLine(" -p --password          account password");
 			Console.WriteLine(" -e --emailtoken        email token");
 			Console.WriteLine(" -g --groupname         group name");
-			Console.WriteLine(" -h --help              print this help");
+			Console.WriteLine(" --help                 print this help");
+			Console.WriteLine(" -w --width             screenshots width");
+			Console.WriteLine(" -h --height            screenshots height");
 			Console.WriteLine();
 			Console.WriteLine("Examples:");
 			Console.WriteLine(" -l bot -p qwerty -e YT7FR -g nyashmyash");
