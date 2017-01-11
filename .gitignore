@@ -1,7 +1,7 @@
 SteamToolset/bin/
 SteamToolset/obj/
-*.csproj
 *.unityproj
+*.suo
 *.tmp
 *.user
 *.userprefs
