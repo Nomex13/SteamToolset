@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Mime;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,16 +15,36 @@ namespace SteamToolset
 	class Program
 	{
 		private static Arguments field_arguments;
-		private static bool field_abort = false;
+		private static volatile bool field_abort = false;
+		static ConsoleEventDelegate field_handler;
+		
+		// Pinvoke
+		private delegate bool ConsoleEventDelegate(int param_eventType);
+		[DllImport("kernel32.dll", SetLastError = true)]
+		private static extern bool SetConsoleCtrlHandler(ConsoleEventDelegate param_callback, bool param_add);
+		static bool ConsoleEventCallback(int param_eventType)
+		{
+			if (param_eventType == 2)
+			{
+				Console.WriteLine();
+				Console.WriteLine("Shutting down.");
+				Global.Instance.Deinit();
+			}
+			return false;
+		}
 
 		static void Main(string[] param_arguments)
 		{
-			Console.CancelKeyPress += ConsoleOnCancelKeyPress;
-
-			Global.Instance.Init();
-
 			// Say hello
 			PrintHello();
+			
+			Console.WriteLine("Starting up.");
+
+			Console.CancelKeyPress += ConsoleOnCancelKeyPress;
+			field_handler = new ConsoleEventDelegate(ConsoleEventCallback);
+			SetConsoleCtrlHandler(field_handler, true);
+
+			Global.Instance.Init();
 
 			// Prepare
 			ClearScreenshots();
@@ -51,11 +72,13 @@ namespace SteamToolset
 			Console.ReadKey();
 		}
 
+
+
 		private static void ConsoleOnCancelKeyPress(object param_sender, ConsoleCancelEventArgs param_consoleCancelEventArgs)
 		{
 			Console.WriteLine();
 			Console.WriteLine();
-			Console.WriteLine("Shutting down. May take some time.");
+			Console.WriteLine("Stopping.");
 			
 			field_abort = true;
 		}
