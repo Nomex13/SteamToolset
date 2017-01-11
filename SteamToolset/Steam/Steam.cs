@@ -12,11 +12,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
-//using CefSharp;
 using CefSharp;
 using Newtonsoft.Json;
-using SHDocVw;
-using WatiN.Core;
 using CefSharp.OffScreen;
 
 namespace SteamToolset
@@ -25,11 +22,8 @@ namespace SteamToolset
 	{
 		private const string field_urlLogin = "https://steamcommunity.com/login/home/";
 		private const string field_urlHome = "https://steamcommunity.com/";
-		//private readonly WebClient field_client;
-		//private readonly IE field_ie;
-		//private readonly WebBrowser field_browser;
+
 		private readonly ChromiumWebBrowser field_browser;
-		//private readonly List<Action> field_queue = new List<Action>();
 		private volatile  bool field_isLoaded = false;
 		private int field_screenshotCount = 0;
 		private string field_pathCache;
@@ -42,8 +36,6 @@ namespace SteamToolset
 				Directory.CreateDirectory(field_pathCache);
 			}
 			Cef.Initialize(new CefSettings() { CachePath = field_pathCache, LogFile = "./browser.log", LogSeverity = LogSeverity.Disable }, performDependencyCheck: true, browserProcessHandler:null);
-
-			//field_client = new WebClient();
 
             // Create the offscreen Chromium browser.
             field_browser =  new ChromiumWebBrowser();
