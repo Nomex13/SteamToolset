@@ -2,7 +2,6 @@ SteamToolset/bin/
 SteamToolset/obj/
 *.csproj
 *.unityproj
-*.sln
 *.suo
 *.tmp
 *.user
