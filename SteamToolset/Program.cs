@@ -37,14 +37,6 @@ namespace SteamToolset
 		{
 			// Say hello
 			PrintHello();
-			
-			Console.WriteLine("Starting up.");
-
-			Console.CancelKeyPress += ConsoleOnCancelKeyPress;
-			field_handler = new ConsoleEventDelegate(ConsoleEventCallback);
-			SetConsoleCtrlHandler(field_handler, true);
-
-			Global.Instance.Init();
 
 			// Prepare
 			ClearScreenshots();
@@ -61,10 +53,19 @@ namespace SteamToolset
 				Console.ReadKey();
 				return;
 			}
+			
+			// Hook the Ctrl+C
+			Console.CancelKeyPress += ConsoleOnCancelKeyPress;
+			field_handler = new ConsoleEventDelegate(ConsoleEventCallback);
+			SetConsoleCtrlHandler(field_handler, true);
+			
+			Console.WriteLine("Starting up.");
+			Global.Instance.Init();
 
 			// Main cycle here
 			Do();
 			
+			Console.WriteLine("Shutting down.");
 			Global.Instance.Deinit();
 
 			Console.WriteLine();
