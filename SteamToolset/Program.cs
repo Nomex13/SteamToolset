@@ -163,7 +163,7 @@ namespace SteamToolset
 			while (true)
 			{
 				// Do stuff
-				Global.Instance.Steam.Filter(group.Url);
+				Global.Instance.Steam.Filter(group);
 				ClearScreenshots(32);
 
 				// Wait until next

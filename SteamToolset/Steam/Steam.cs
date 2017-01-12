@@ -205,9 +205,9 @@ namespace SteamToolset
 			string steamId = (string)Execute("g_steamID;").Result;
 			return steamId;
 		}
-		public void Filter(string param_url)
+		public void Filter(Group param_group)
 		{
-			Load(param_url);
+			Load(param_group.Url);
 
 			Screenshot("group");
 
@@ -219,7 +219,9 @@ namespace SteamToolset
 				string commentText = (string)Execute("document.getElementsByClassName(\"commentthread_comment_text\")[" + commentPosition + "].innerText;").Result;
 				string commentHtmlId = (string)Execute("document.getElementsByClassName(\"commentthread_comment_text\")[" + commentPosition + "].id;").Result;
 				string commentId = commentHtmlId.Substring(16);
-				GroupComment comment = new GroupComment(commentText, commentId);
+				string commentProfileName = (string)Execute("document.getElementById(\"comment_" + commentId + "\").getElementsByTagName(\"bdi\")[0].innerText;").Result;
+				string commentProfileUrl = (string)Execute("document.getElementById(\"comment_" + commentId + "\").getElementsByClassName(\"commentthread_author_link\")[0].href;").Result;
+				GroupComment comment = new GroupComment(commentProfileName, commentProfileUrl, commentText, commentId);
 				comments.Add(comment);
 			}
 			
@@ -233,6 +235,19 @@ namespace SteamToolset
 					string padding = "    ";
 					Console.WriteLine("Comment is considered spam and is being deleted:");
 					Console.WriteLine(padding + comment.Text.Replace("\n", "\n" + padding));
+
+					StringBuilder stringBuilder = new StringBuilder();
+					stringBuilder.Append("\r\n[Comment.Deleted]");
+					stringBuilder.Append(String.Format("\r\nTimestamp = {0:yyyy/MM/dd HH:mm:ss zzz}", DateTime.Now));
+					stringBuilder.Append("\r\nNickname  = ");
+					stringBuilder.Append(comment.ProfileName);
+					stringBuilder.Append("\r\nProfile   = ");
+					stringBuilder.Append(comment.ProfileUrl);
+					stringBuilder.Append("\r\nComment   = ");
+					stringBuilder.Append(comment.Text.Replace("\r", "").Replace("\n", " \\ "));
+					stringBuilder.Append("\r\n");
+
+					File.AppendAllText("group.filter." + param_group.Name.ToLower() + ".txt", stringBuilder.ToString());
 
 					Execute("javascript:CCommentThread.DeleteComment('" + groupId + "', '" + comment.Id + "');");
 					Thread.Sleep(5000);

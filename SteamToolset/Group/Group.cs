@@ -10,6 +10,13 @@ namespace SteamToolset
 	{
 		private string field_name;
 		//private string field_url;
+		public string Name
+		{
+			get
+			{
+				return field_name;
+			}
+		}
 		public string Url
 		{
 			get

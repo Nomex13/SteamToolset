@@ -8,6 +8,22 @@ namespace SteamToolset
 {
 	public class GroupComment
 	{
+		private string field_profileName;
+		public string ProfileName
+		{
+			get
+			{
+				return field_profileName;
+			}
+		}
+		private string field_profileUrl;
+		public string ProfileUrl
+		{
+			get
+			{
+				return field_profileUrl;
+			}
+		}
 		private string field_text;
 		public string Text
 		{
@@ -24,10 +40,12 @@ namespace SteamToolset
 				return field_id;
 			}
 		}
-		private List<string> field_keyWords = new List<string>() { "$", "dollar", "profit", "http", "code", "giveaway" };
+		private List<string> field_keyWords = new List<string>() { "$", "dollar", "money", "profit", "http", "code", "giveaway", "discount", "it's ez", "{link removed}" };
 
-		public GroupComment(string param_text, string param_id = null)
+		public GroupComment(string param_profileName, string param_profileUrl, string param_text, string param_id = null)
 		{
+			field_profileName = param_profileName;
+			field_profileUrl = param_profileUrl;
 			field_text = param_text;
 			field_id = param_id;
 		}
@@ -42,7 +60,7 @@ namespace SteamToolset
 					count++;
 				}
 			}
-			return count > field_keyWords.Count / 2;
+			return count >= 4;
 		}
 	}
 }
