@@ -40,7 +40,7 @@ namespace SteamToolset
 				return field_id;
 			}
 		}
-		private List<string> field_keyWords = new List<string>() { "$", "dollar", "money", "profit", "http", "code", "giveaway", "discount", "action", "partner", "skins", "it's ez", "{link removed}" };
+		private List<string> field_keyWords = new List<string>() { "$", "dollar", "money", "profit", "http", "promo", "code", "trade", "giveaway", "discount", "action", "partner", "skins", "it's ez", "{link removed}" };
 
 		public GroupComment(string param_profileName, string param_profileUrl, string param_text, string param_id = null)
 		{

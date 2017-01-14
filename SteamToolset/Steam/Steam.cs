@@ -23,10 +23,14 @@ namespace SteamToolset
 		private const string field_urlLogin = "https://steamcommunity.com/login/home/";
 		private const string field_urlHome = "https://steamcommunity.com/";
 
-		private readonly ChromiumWebBrowser field_browser;
+		private bool field_inited = false;
+		private ChromiumWebBrowser field_browser;
 		private volatile  bool field_isLoaded = false;
 		private int field_screenshotCount = 0;
 		private string field_pathCache;
+
+		private int field_width = 1024;
+		private int field_height = 768;
 
 		public Steam()
 		{
@@ -35,16 +39,8 @@ namespace SteamToolset
 			{
 				Directory.CreateDirectory(field_pathCache);
 			}
-			Cef.Initialize(new CefSettings() { CachePath = field_pathCache, LogFile = "./browser.log", LogSeverity = LogSeverity.Disable }, performDependencyCheck: true, browserProcessHandler:null);
 
-            // Create the offscreen Chromium browser.
-            field_browser =  new ChromiumWebBrowser();
-			field_browser.Size = new Size(1024, 2048);
-
-            // An event that is fired when the first page is finished loading.
-            // This returns to us from another thread.
-			field_browser.LoadingStateChanged += BrowserOnLoadingStateChanged;
-			field_browser.FrameLoadEnd += BrowserOnFrameLoadEnd;
+			Clear();
 
 			//browser.RenderProcessMessageHandler = new RenderProcessMessageHandler();
 
@@ -57,26 +53,80 @@ namespace SteamToolset
 
 		public void Init()
 		{
+			if (field_inited)
+			{
+				return;
+			}
 			if (!Cef.IsInitialized)
 			{
 				if (!Directory.Exists(field_pathCache))
 				{
 					Directory.CreateDirectory(field_pathCache);
 				}
-				Cef.Initialize(new CefSettings() { CachePath = field_pathCache }, performDependencyCheck: true, browserProcessHandler:null);
+				if (!Cef.IsInitialized)
+				{
+					Cef.Initialize(new CefSettings() { CachePath = field_pathCache, LogFile = "./browser.log", LogSeverity = LogSeverity.Disable }, performDependencyCheck: true, browserProcessHandler:null);
+				}
+				//Cef.Initialize(new CefSettings() { CachePath = field_pathCache }, performDependencyCheck: true, browserProcessHandler:null);
+			}
+			if (field_browser == null)
+			{
+				field_browser = new ChromiumWebBrowser();
+				field_browser.Size = new Size(field_width, field_height);
+
+				while (!field_browser.IsBrowserInitialized)
+				{
+					Thread.Sleep(10);
+				}
+
+				// An event that is fired when the first page is finished loading.
+				// This returns to us from another thread.
+				field_browser.LoadingStateChanged += BrowserOnLoadingStateChanged;
+				field_browser.FrameLoadEnd += BrowserOnFrameLoadEnd;
 			}
 
-			while (!field_browser.IsBrowserInitialized)
-			{
-				Thread.Sleep(10);
-			}
+			field_inited = true;
 		}
 		public void Deinit()
 		{
-			if (Cef.IsInitialized)
+			if (!field_inited)
 			{
-				Cef.Shutdown();
+				return;
 			}
+			if (field_browser != null);
+			{
+				//field_browser.Dispose();
+				field_browser = null;
+			}
+			//if (Cef.IsInitialized)
+			//{
+			//	Cef.Shutdown();
+			//}
+
+			//// HACK: Just kill it already
+			////TextWriter textWriter = Console.Out;
+			////Console.SetOut(TextWriter.Null);
+			//System.Diagnostics.Process process = new System.Diagnostics.Process();
+			//System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+			//startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+			//startInfo.FileName = "cmd.exe";
+			//startInfo.Arguments = "/C taskkill /IM CefSharp.BrowserSubprocess.exe /F";
+			//process.StartInfo = startInfo;
+			//process.Start();
+			//process.WaitForExit();
+			////Console.SetOut(textWriter);
+
+			field_inited = false;
+		}
+		public void Clear()
+		{
+			Deinit();
+			
+			Init();
+
+			//// Create the offscreen Chromium browser.
+			//field_browser =  new ChromiumWebBrowser();
+			//field_browser.Size = new Size(1024, 2048);
 		}
 
 		//// Wait for the underlying `Javascript Context` to be created, this is only called for the main frame.
@@ -156,13 +206,19 @@ namespace SteamToolset
 		}
 		public void Resize(int? param_width = null, int? param_height = null)
 		{
+			//return;
 			int width = param_width.HasValue ? param_width.Value : field_browser.Size.Width;
 			int height = param_height.HasValue ? param_height.Value : field_browser.Size.Height;
-			field_browser.Size = new Size(width, height);
+
+			field_width = width;
+			field_height = height;
+
+			field_browser.Size = new Size(field_width, field_height);
 		}
 
 		private void Screenshot(string param_name = "")
 		{
+			//return;
 			string path = "./screenshots/" + String.Format("{0:D4}", field_screenshotCount) + (param_name == "" ? "" : ("." + param_name)) + ".png";
 			try
 			{

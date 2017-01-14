@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using CefSharp;
 
 namespace SteamToolset
 {
@@ -29,6 +30,7 @@ namespace SteamToolset
 				Console.WriteLine();
 				Console.WriteLine("Shutting down.");
 				Global.Instance.Deinit();
+				Cef.Shutdown();
 			}
 			return false;
 		}
@@ -67,6 +69,7 @@ namespace SteamToolset
 			
 			Console.WriteLine("Shutting down.");
 			Global.Instance.Deinit();
+			Cef.Shutdown();
 
 			Console.WriteLine();
 			Console.Write("Press any key");
@@ -94,36 +97,36 @@ namespace SteamToolset
 			// Ensure we've got login
 			if (String.IsNullOrEmpty(field_arguments.AccountLogin))
 			{
-				Console.Write("Login      ");
+				Console.Write("Login      : ");
 				field_arguments.AccountLogin = Console.ReadLine();
 			}
 			else
 			{
-				Console.WriteLine("Login      " + field_arguments.AccountLogin);
+				Console.WriteLine("Login      : " + field_arguments.AccountLogin);
 			}
 			// Ensure we've got password
 			if (String.IsNullOrEmpty(field_arguments.AccountPassword))
 			{
-				Console.Write("Password   ");
+				Console.Write("Password   : ");
 				field_arguments.AccountPassword = Console.ReadLine();
 				Util.ConsoleClearLinePrevious();
-				Console.Write("Password   ");
+				Console.Write("Password   : ");
 				Console.Write(new string('*', field_arguments.AccountPassword.Length)); 
 				Console.WriteLine();
 			}
 			else
 			{
-				Console.WriteLine("Password   " + new string('*', field_arguments.AccountPassword.Length));
+				Console.WriteLine("Password   : " + new string('*', field_arguments.AccountPassword.Length));
 			}
 			// Ensure we've got group name
 			if (String.IsNullOrEmpty(field_arguments.GroupName))
 			{
-				Console.Write("Group name ");
+				Console.Write("Group name : ");
 				field_arguments.GroupName = Console.ReadLine();
 			}
 			else
 			{
-				Console.WriteLine("Group name " + field_arguments.GroupName);
+				Console.WriteLine("Group name : " + field_arguments.GroupName);
 			}
 
 			Console.WriteLine();
@@ -158,12 +161,14 @@ namespace SteamToolset
 			}
 
 			Group group = new Group(field_arguments.GroupName);
-			int delay = 60000;
+			int delay = 20000;//60000;
 
 			while (true)
 			{
 				// Do stuff
+				//Global.Instance.Steam.Init();
 				Global.Instance.Steam.Filter(group);
+				//Global.Instance.Steam.Deinit();
 				ClearScreenshots(32);
 
 				// Wait until next
